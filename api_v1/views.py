@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import db_helper as db_helper
+from db_helper import db_helper
 
 from . import crud
 from .schemas import City, CityCreate
@@ -16,18 +16,16 @@ router = APIRouter(
 
 @router.get("", response_model=List[City])
 async def get_cities(
-    session: AsyncSession = Depends(
-        db_helper.DatabaseHelper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """GET - Получение всех городов."""
 
-    return await crud.get_products(session=session)
+    return await crud.get_cities(session=session)
 
 
 @router.get("/{city_id}", response_model=City)
 async def get_product(city_id: int,
-                      session: AsyncSession = Depends(
-                          db_helper.DatabaseHelper.scoped_session_dependency),) -> City:
+                      session: AsyncSession = Depends(db_helper.session_dependency),) -> City:
     """RETRIEVE - Получение города по id."""
 
     city = await crud.get_city(session=session, city_id=city_id)
@@ -40,7 +38,7 @@ async def get_product(city_id: int,
 @router.post("", response_model=City)
 async def create_product(
     city_in: CityCreate,
-    session: AsyncSession = Depends(db_helper.DatabaseHelper.scoped_session_dependency),
+    session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """CREATE - Создание продукта."""
 

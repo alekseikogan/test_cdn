@@ -32,14 +32,17 @@ class DatabaseHelper:
         )
         return session
 
-    @classmethod
-    async def scoped_session_dependency(cls) -> AsyncSession:
+    async def session_dependency(self) -> AsyncSession:
         """Конкретная сессия, через которую будем работать с БД."""
 
-        async with cls.get_scoped_session() as session:
-            session = cls.get_scoped_session()
+        session = self.get_scoped_session()
+        try:
             yield session
+        finally:
             await session.close()
+        # async with self.get_scoped_session() as session:
+        #     yield session
+        #     await session.remove()
 
 
 db_helper = DatabaseHelper(
