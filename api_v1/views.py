@@ -37,12 +37,12 @@ async def get_product(city_id: int,
 
 @router.post("", response_model=City)
 async def create_product(
-    city_in: CityCreate,
+    name: str,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """CREATE - Создание продукта."""
 
-    return await crud.create_product(session=session, city_in=city_in)
+    return await crud.create_city(session=session, name=name)
 
 
 

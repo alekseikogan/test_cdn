@@ -44,21 +44,16 @@ async def get_city(session: AsyncSession, city_id: int) -> City | None:
     return await session.get(City, city_id)
 
 
-async def create_city(session: AsyncSession, name: CityCreate) -> City:
+async def create_city(session: AsyncSession, name: str) -> dict:
     """CREATE - Создание города."""
 
     # ТУТ добавить логику работы с API
     city_in = get_coordinates_of_city(name)
     if city_in is not None:
-        city = City(**city_in.model_dump())
+        city = City(**city_in)
         session.add(city)
         await session.commit()
-        return {
-            'success': True,
-            'message': f'Город {city.name} успешно добавлен!',
-            'latitude': city.latitude,
-            'longitude': city.longitude
-        }
+        return city
 
 
 # async def delete_city(session: AsyncSession, product: City) -> City:
