@@ -1,10 +1,8 @@
 from contextlib import asynccontextmanager
 
-import geopy.distance
-import requests
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import FastAPI
+
 
 from api_v1.views import router as api_router
 from db_helper import db_helper

@@ -1,5 +1,6 @@
 from typing import List
 
+import geopy.distance
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -45,7 +46,6 @@ async def create_product(
     return await crud.create_city(session=session, name=name)
 
 
-
 # @router.delete("/{product_id}")
 # async def delete_product(
 #     product: City = Depends(product_by_id),
@@ -64,10 +64,12 @@ async def create_product(
 async def read_near_cities(latitude: float, longitude: float):
     """Возвращает список двух ближайших городов."""
 
-    pass
-    # nearest_cities = []
-    # for city in cities:
-    #     distance = geopy.distance.geodesic((lat, lon), (city.coordinates[0], city.coordinates[1])).miles
-    #     nearest_cities.append({"name": city.name, "distance": distance})
-    # nearest_cities.sort(key=lambda x: x["distance"])
-    # return nearest_cities[:2]
+    nearest_cities = []
+    cities = await crud.get_cities(session=db_helper.get_scoped_session())
+
+    for city in cities:
+        distance = geopy.distance.geodesic(
+            (latitude, longitude), (city.latitude, city.longitude)).kilometers
+        nearest_cities.append({"name": city.name, "distance_km": distance})
+    nearest_cities.sort(key=lambda x: x["distance"])
+    return nearest_cities[:2]
