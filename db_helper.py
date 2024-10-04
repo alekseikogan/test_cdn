@@ -3,8 +3,22 @@ from asyncio import current_task
 from sqlalchemy.ext.asyncio import (AsyncSession, async_scoped_session,
                                     async_sessionmaker, create_async_engine)
 
-from core.config import settings
+from .config import settings
 
+from pathlib import Path
+from pydantic_settings import BaseSettings
+
+BASE_DIR = Path(__file__).parent
+DB_PATH = BASE_DIR / "shop_db.sqlite3"
+
+
+class Settings(BaseSettings):
+    """Для подгрузки переменных окружения."""
+
+    url: str = f"sqlite+aiosqlite:///{DB_PATH}"
+
+
+settings = Settings()
 
 class DatabaseHelper:
     def __init__(self, url: str, echo: bool = False):

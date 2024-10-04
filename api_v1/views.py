@@ -7,15 +7,15 @@ from core.models import db_helper
 
 from . import crud
 from ..dependencies import product_by_id
-from .schemas import Product, ProductCreate, ProductPartialUpdate, ProductUpdate
+from .schemas import Town, TownCreate, TownPartialUpdate, TownUpdate
 
 router = APIRouter(
     prefix="/products",
-    tags=["Products"],
+    tags=["Towns"],
 )
 
 
-@router.get("", response_model=List[Product])
+@router.get("", response_model=List[Town])
 async def get_products(
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
@@ -24,16 +24,16 @@ async def get_products(
     return await crud.get_products(session=session)
 
 
-@router.get("/{product_id}", response_model=Product)
-async def get_product(product: Product = Depends(product_by_id)) -> Product:
+@router.get("/{product_id}", response_model=Town)
+async def get_product(product: Town = Depends(product_by_id)) -> Town:
     """RETRIEVE - Получение продукта по id."""
 
     return product
 
 
-@router.post("", response_model=Product)
+@router.post("", response_model=Town)
 async def create_product(
-    product_in: ProductCreate,
+    product_in: TownCreate,
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """CREATE - Создание продукта."""
@@ -43,8 +43,8 @@ async def create_product(
 
 @router.put("/{product_id}")
 async def update_product(
-    product_update: ProductUpdate,
-    product: Product = Depends(product_by_id),
+    product_update: TownUpdate,
+    product: Town = Depends(product_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """PUT - Обновление продукта."""
@@ -58,8 +58,8 @@ async def update_product(
 
 @router.patch("/{product_id}")
 async def partial_update_product(
-    product_update: ProductPartialUpdate,
-    product: Product = Depends(product_by_id),
+    product_update: TownPartialUpdate,
+    product: Town = Depends(product_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """PATCH - Частичное обновление продукта."""
@@ -74,7 +74,7 @@ async def partial_update_product(
 
 @router.delete("/{product_id}")
 async def delete_product(
-    product: Product = Depends(product_by_id),
+    product: Town = Depends(product_by_id),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """DELETE - Удаление продукта."""

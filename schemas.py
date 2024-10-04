@@ -1,15 +1,15 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
-class TownBase(BaseModel):
+class Town(BaseModel):
     """Модель города."""
     id: int
     title: str  # название города
-    latitude: int  # широта
+    latitude: str  # широта
     longitude: str  # долгота
 
 
-class TownCreate(TownBase):
+class TownCreate(Town):
     """Добавление города в БД."""
 
     pass
