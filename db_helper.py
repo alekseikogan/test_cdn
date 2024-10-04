@@ -1,24 +1,12 @@
 from asyncio import current_task
+from pathlib import Path
 
 from sqlalchemy.ext.asyncio import (AsyncSession, async_scoped_session,
                                     async_sessionmaker, create_async_engine)
 
-from .config import settings
-
-from pathlib import Path
-from pydantic_settings import BaseSettings
-
 BASE_DIR = Path(__file__).parent
-DB_PATH = BASE_DIR / "shop_db.sqlite3"
+DB_PATH = BASE_DIR / "cities.sqlite3"
 
-
-class Settings(BaseSettings):
-    """Для подгрузки переменных окружения."""
-
-    url: str = f"sqlite+aiosqlite:///{DB_PATH}"
-
-
-settings = Settings()
 
 class DatabaseHelper:
     def __init__(self, url: str, echo: bool = False):
@@ -53,6 +41,6 @@ class DatabaseHelper:
 
 
 db_helper = DatabaseHelper(
-    url=settings.db.url,
-    echo=settings.db.echo
+    url=f"sqlite+aiosqlite:///{DB_PATH}",
+    echo=True,
 )

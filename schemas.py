@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Town(BaseModel):
+class City(BaseModel):
     """Модель города."""
     id: int
     title: str  # название города
@@ -9,7 +9,7 @@ class Town(BaseModel):
     longitude: str  # долгота
 
 
-class TownCreate(Town):
+class CityCreate(City):
     """Добавление города в БД."""
 
     pass
