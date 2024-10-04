@@ -1,86 +1,75 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import db_helper
+import db_helper as db_helper
 
 from . import crud
-from ..dependencies import product_by_id
-from .schemas import Town, TownCreate, TownPartialUpdate, TownUpdate
+from .schemas import City, CityCreate
 
 router = APIRouter(
-    prefix="/products",
-    tags=["Towns"],
+    prefix="/cities",
+    tags=["Cities"],
 )
 
 
-@router.get("", response_model=List[Town])
-async def get_products(
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+@router.get("", response_model=List[City])
+async def get_cities(
+    session: AsyncSession = Depends(
+        db_helper.DatabaseHelper.scoped_session_dependency),
 ):
-    """GET - Получение всех продуктов."""
+    """GET - Получение всех городов."""
 
     return await crud.get_products(session=session)
 
 
-@router.get("/{product_id}", response_model=Town)
-async def get_product(product: Town = Depends(product_by_id)) -> Town:
-    """RETRIEVE - Получение продукта по id."""
+@router.get("/{city_id}", response_model=City)
+async def get_product(city_id: int,
+                      session: AsyncSession = Depends(
+                          db_helper.DatabaseHelper.scoped_session_dependency),) -> City:
+    """RETRIEVE - Получение города по id."""
 
-    return product
+    city = await crud.get_city(session=session, city_id=city_id)
+    if city is not None:
+        return city
+
+    raise HTTPException(status_code=404, detail="City not found")
 
 
-@router.post("", response_model=Town)
+@router.post("", response_model=City)
 async def create_product(
-    product_in: TownCreate,
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+    city_in: CityCreate,
+    session: AsyncSession = Depends(db_helper.DatabaseHelper.scoped_session_dependency),
 ):
     """CREATE - Создание продукта."""
 
-    return await crud.create_product(session=session, product_in=product_in)
+    return await crud.create_product(session=session, city_in=city_in)
 
 
-@router.put("/{product_id}")
-async def update_product(
-    product_update: TownUpdate,
-    product: Town = Depends(product_by_id),
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
-    """PUT - Обновление продукта."""
 
-    return await crud.update_product(
-        session=session,
-        product=product,
-        product_update=product_update,
-    )
+# @router.delete("/{product_id}")
+# async def delete_product(
+#     product: City = Depends(product_by_id),
+#     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+# ):
+#     """DELETE - Удаление продукта."""
 
-
-@router.patch("/{product_id}")
-async def partial_update_product(
-    product_update: TownPartialUpdate,
-    product: Town = Depends(product_by_id),
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
-    """PATCH - Частичное обновление продукта."""
-
-    return await crud.update_product(
-        session=session,
-        product=product,
-        product_update=product_update,
-        partial=True,
-    )
+#     await crud.delete_product(session=session, product=product)
+#     return {
+#         "success": True,
+#         "message": f"Продукт id={product.id} {product.name} успешно удален!",
+#     }
 
 
-@router.delete("/{product_id}")
-async def delete_product(
-    product: Town = Depends(product_by_id),
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-):
-    """DELETE - Удаление продукта."""
+@router.get("/near")
+async def read_near_cities(latitude: float, longitude: float):
+    """Возвращает список двух ближайших городов."""
 
-    await crud.delete_product(session=session, product=product)
-    return {
-        "success": True,
-        "message": f"Продукт id={product.id} {product.name} успешно удален!",
-    }
+    pass
+    # nearest_cities = []
+    # for city in cities:
+    #     distance = geopy.distance.geodesic((lat, lon), (city.coordinates[0], city.coordinates[1])).miles
+    #     nearest_cities.append({"name": city.name, "distance": distance})
+    # nearest_cities.sort(key=lambda x: x["distance"])
+    # return nearest_cities[:2]

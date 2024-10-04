@@ -1,52 +1,68 @@
 from typing import List
 
+import requests
+from fastapi import HTTPException
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api_v1.products.schemas import TownCreate, TownPartialUpdate, TownUpdate
-from core.models import Town
+from models import City
+
+from .schemas import CityCreate
+
+API_KEY = 'd25fe013c17545d48a5d4a6659c0d1ff'
 
 
-async def get_products(session: AsyncSession) -> List[Town]:
-    """GET - Получение всех продуктов."""
+def get_coordinates_of_city(name):
+    response = requests.get(
+        f"https://api.geoapify.com/v1/geocode/search?text={name}&limit=1&type=city&apiKey={API_KEY}"
+    )
+    if response.status_code == 200:
+        data = response.json().get('features')[0]['properties']
+        latitude = data.get("lat")
+        longitude = data.get("lon")
+        return {
+            "name": name,
+            'latitude': latitude,
+            'longitude': longitude
+        }
+    else:
+        raise HTTPException(status_code=404, detail="City in API server not found!")
 
-    stmt = select(Town).order_by(Town.id)
+
+async def get_cities(session: AsyncSession) -> List[City]:
+    """GET - Получение всех городов."""
+
+    stmt = select(City).order_by(City.id)
     result: Result = await session.execute(stmt)
-    products = result.scalars().all()
-    return list(products)
+    cities = result.scalars().all()
+    return list(cities)
 
 
-async def get_product(session: AsyncSession, product_id: int) -> Town | None:
-    """RETRIEVE - Получение продукта по id."""
+async def get_city(session: AsyncSession, city_id: int) -> City | None:
+    """RETRIEVE - Получение города по id."""
 
-    return await session.get(Town, product_id)
-
-
-async def create_product(session: AsyncSession, product_in: TownCreate) -> Town:
-    """CREATE - Создание продукта."""
-
-    product = Town(**product_in.model_dump())
-    session.add(product)
-    await session.commit()
-    return product
+    return await session.get(City, city_id)
 
 
-async def update_product(
-    session: AsyncSession,
-    product: Town,
-    product_update: TownUpdate | TownPartialUpdate,
-    partial: bool = False,
-) -> Town:
-    """PUT / PATCH - Обновление продукта."""
+async def create_city(session: AsyncSession, name: CityCreate) -> City:
+    """CREATE - Создание города."""
 
-    for name, value in product_update.model_dump(exclude_unset=partial).items():
-        setattr(product, name, value)
-    await session.commit()
-    return product
+    # ТУТ добавить логику работы с API
+    city_in = get_coordinates_of_city(name)
+    if city_in is not None:
+        city = City(**city_in.model_dump())
+        session.add(city)
+        await session.commit()
+        return {
+            'success': True,
+            'message': f'Город {city.name} успешно добавлен!',
+            'latitude': city.latitude,
+            'longitude': city.longitude
+        }
 
 
-async def delete_product(session: AsyncSession, product: Town) -> Town:
-    """DELETE - Удаление продукта."""
+# async def delete_city(session: AsyncSession, product: City) -> City:
+#     """DELETE - Удаление продукта."""
 
-    await session.delete(product)
-    await session.commit()
+#     await session.delete(product)
+#     await session.commit()
