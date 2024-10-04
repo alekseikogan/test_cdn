@@ -60,16 +60,20 @@ async def create_product(
 #     }
 
 
-@router.get("/near")
-async def read_near_cities(latitude: float, longitude: float):
+@router.post("/near")
+async def read_near_cities(
+    latitude: float,
+    longitude: float,
+    session: AsyncSession = Depends(db_helper.session_dependency)
+):
     """Возвращает список двух ближайших городов."""
 
     nearest_cities = []
-    cities = await crud.get_cities(session=db_helper.get_scoped_session())
-
+    print(f'latitude = {latitude}, longitude = {longitude}')
+    cities = await crud.get_cities(session=session)
     for city in cities:
         distance = geopy.distance.geodesic(
             (latitude, longitude), (city.latitude, city.longitude)).kilometers
         nearest_cities.append({"name": city.name, "distance_km": distance})
-    nearest_cities.sort(key=lambda x: x["distance"])
-    return nearest_cities[:2]
+    nearest_cities.sort(key=lambda x: x["distance_km"])
+    return nearest_cities[1:3]
