@@ -25,8 +25,10 @@ async def get_cities(
 
 
 @router.get("/{name}", response_model=City)
-async def get_city_by_name(name: str,
-                           session: AsyncSession = Depends(db_helper.session_dependency)) -> City:
+async def get_city_by_name(
+    name: str,
+    session: AsyncSession = Depends(db_helper.session_dependency)
+) -> City:
     """RETRIEVE - Получение города по названию."""
 
     city = await crud.get_city(session=session, name=name)
@@ -40,8 +42,8 @@ async def get_city_by_name(name: str,
 async def create_city(
     name: str,
     session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    """CREATE - Создание продукта."""
+) -> City:
+    """CREATE - Создание записи города в базу данных."""
 
     return await crud.create_city(session=session, name=name)
 

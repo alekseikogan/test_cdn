@@ -24,7 +24,8 @@ class DatabaseHelper:
         )
 
     def get_scoped_session(self):
-        """Создает сессию и связывает ее с текущим потоком выполнения (scope)."""
+        """Создает сессию и связывает ее с текущим
+        потоком выполнения (scope)."""
 
         session = async_scoped_session(
             session_factory=self.session_factory,

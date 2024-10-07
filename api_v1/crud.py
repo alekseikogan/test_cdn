@@ -7,8 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import City
 
-from .schemas import CityCreate
-
 API_KEY = 'd25fe013c17545d48a5d4a6659c0d1ff'
 
 
@@ -27,7 +25,9 @@ def get_coordinates_of_city(name):
             'longitude': longitude
         }
     else:
-        raise HTTPException(status_code=404, detail="City in API server not found!")
+        raise HTTPException(
+            status_code=404,
+            detail="City in API server not found!")
 
 
 async def get_cities(session: AsyncSession) -> List[City]:
@@ -60,7 +60,7 @@ async def create_city(session: AsyncSession, name: str) -> dict:
 
 
 async def delete_city(session: AsyncSession, city: City) -> City:
-    """DELETE - Удаление продукта."""
+    """DELETE - Удаление города."""
 
     await session.delete(city)
     await session.commit()
