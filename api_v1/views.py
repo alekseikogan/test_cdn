@@ -78,8 +78,8 @@ async def read_near_cities(
     """Возвращает список двух ближайших городов."""
 
     nearest_cities = []
-    print(f'latitude = {latitude}, longitude = {longitude}')
     cities = await crud.get_cities(session=session)
+
     for city in cities:
         distance = geopy.distance.geodesic(
             (latitude, longitude), (city.latitude, city.longitude)).kilometers

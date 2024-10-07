@@ -11,7 +11,6 @@ from models import City
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with db_helper.engine.begin() as conn:
-        print("Creating tables...")
         await conn.run_sync(City.metadata.create_all)
     yield
 
@@ -23,4 +22,4 @@ app.include_router(api_router, prefix='/api/v1')
 
 
 if __name__ == "__main__":
-    uvicorn.run("cities:app", reload=True)
+    uvicorn.run("main:app", reload=True)
