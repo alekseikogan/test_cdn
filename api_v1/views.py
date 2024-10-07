@@ -1,13 +1,13 @@
 from typing import List
 
 import geopy.distance
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db_helper import db_helper
 
 from . import crud
-from .schemas import City, CityCreate
+from .schemas import City
 
 router = APIRouter(
     prefix="/cities",
@@ -46,26 +46,25 @@ async def create_city(
     return await crud.create_city(session=session, name=name)
 
 
-# @router.delete("/{product_id}")
-# async def delete_city(
-#     product_name: str,
-#     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
-# ):
-#     """DELETE - Удаление продукта."""
+@router.delete("/{name}")
+async def delete_city(
+    name: str,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    """DELETE - Удаление города по названию."""
 
-    # city = await crud.get_product(session=session, product_id=product_id)
-    # if product is not None:
-    #     return product
-    # raise HTTPException(
-    #     status_code=status.HTTP_404_NOT_FOUND,
-    #     detail=f'Продукт {product_id} не найден!'
-    # )
+    city = await crud.get_city(session=session, name=name)
+    if city is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Города {name} нет в базе!',
+        )
 
-#     await crud.delete_product(session=session, product=product)
-#     return {
-#         "success": True,
-#         "message": f"Продукт id={product.id} {product.name} успешно удален!",
-#     }
+    await crud.delete_city(session=session, city=city)
+    return {
+        "success": True,
+        "message": f"Город {city.name} успешно удален!",
+    }
 
 
 @router.post("/near")

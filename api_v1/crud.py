@@ -59,8 +59,8 @@ async def create_city(session: AsyncSession, name: str) -> dict:
         return city
 
 
-# async def delete_city(session: AsyncSession, city: City) -> City:
-#     """DELETE - Удаление продукта."""
+async def delete_city(session: AsyncSession, city: City) -> City:
+    """DELETE - Удаление продукта."""
 
-#     await session.delete(сity)
-#     await session.commit()
+    await session.delete(city)
+    await session.commit()
