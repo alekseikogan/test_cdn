@@ -40,9 +40,6 @@ class DatabaseHelper:
             yield session
         finally:
             await session.close()
-        # async with self.get_scoped_session() as session:
-        #     yield session
-        #     await session.remove()
 
 
 db_helper = DatabaseHelper(

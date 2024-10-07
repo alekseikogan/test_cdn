@@ -24,12 +24,12 @@ async def get_cities(
     return await crud.get_cities(session=session)
 
 
-@router.get("/{city_id}", response_model=City)
-async def get_product(city_id: int,
-                      session: AsyncSession = Depends(db_helper.session_dependency),) -> City:
-    """RETRIEVE - Получение города по id."""
+@router.get("/{name}", response_model=City)
+async def get_city_by_name(name: str,
+                           session: AsyncSession = Depends(db_helper.session_dependency)) -> City:
+    """RETRIEVE - Получение города по названию."""
 
-    city = await crud.get_city(session=session, city_id=city_id)
+    city = await crud.get_city(session=session, name=name)
     if city is not None:
         return city
 
@@ -37,7 +37,7 @@ async def get_product(city_id: int,
 
 
 @router.post("", response_model=City)
-async def create_product(
+async def create_city(
     name: str,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
@@ -47,11 +47,19 @@ async def create_product(
 
 
 # @router.delete("/{product_id}")
-# async def delete_product(
-#     product: City = Depends(product_by_id),
+# async def delete_city(
+#     product_name: str,
 #     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 # ):
 #     """DELETE - Удаление продукта."""
+
+    # city = await crud.get_product(session=session, product_id=product_id)
+    # if product is not None:
+    #     return product
+    # raise HTTPException(
+    #     status_code=status.HTTP_404_NOT_FOUND,
+    #     detail=f'Продукт {product_id} не найден!'
+    # )
 
 #     await crud.delete_product(session=session, product=product)
 #     return {

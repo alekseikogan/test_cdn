@@ -13,6 +13,7 @@ API_KEY = 'd25fe013c17545d48a5d4a6659c0d1ff'
 
 
 def get_coordinates_of_city(name):
+    """GET - Получение координат города по названию через внешний API."""
     response = requests.get(
         f"https://api.geoapify.com/v1/geocode/search?text={name}&limit=1&type=city&apiKey={API_KEY}"
     )
@@ -32,23 +33,25 @@ def get_coordinates_of_city(name):
 async def get_cities(session: AsyncSession) -> List[City]:
     """GET - Получение всех городов."""
 
-    stmt = select(City).order_by(City.id)
+    stmt = select(City).order_by(City.id).limit(5)
     result: Result = await session.execute(stmt)
     cities = result.scalars().all()
     return list(cities)
 
 
-async def get_city(session: AsyncSession, city_id: int) -> City | None:
-    """RETRIEVE - Получение города по id."""
+async def get_city(session: AsyncSession, name: str) -> City | None:
+    """RETRIEVE - Получение города по названию."""
 
-    return await session.get(City, city_id)
+    query = select(City).where(City.name == name)
+    result = await session.execute(query)
+    city = result.scalars().first()
+    return city
 
 
 async def create_city(session: AsyncSession, name: str) -> dict:
     """CREATE - Создание города."""
 
-    # ТУТ добавить логику работы с API
-    city_in = get_coordinates_of_city(name)
+    city_in = get_coordinates_of_city(name)  # загрузка геопозиции с API
     if city_in is not None:
         city = City(**city_in)
         session.add(city)
@@ -59,5 +62,5 @@ async def create_city(session: AsyncSession, name: str) -> dict:
 # async def delete_city(session: AsyncSession, city: City) -> City:
 #     """DELETE - Удаление продукта."""
 
-#     await session.delete(product)
+#     await session.delete(сity)
 #     await session.commit()
