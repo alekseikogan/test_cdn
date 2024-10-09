@@ -9,7 +9,7 @@ class CityBase(BaseModel):
 
 
 class City(CityBase):
-    """Модель города для возвата данных."""
+    """Модель города для возврата данных."""
 
     model_config = ConfigDict(from_attributes=True)
     id: int
